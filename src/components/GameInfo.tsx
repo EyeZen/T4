@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import PlayerTurn from './PlayerTurn';
-import MoveTimers from './MoveTimers';
 import Settings from './Settings';
 import RulesPopup from './RulesPopup';
 import { Info } from 'lucide-react';
 
 const GameInfo: React.FC = () => {
-  const { winner, resetGame, currentPlayer } = useGame();
+  const { winner, resetGame } = useGame();
   const [showSettings, setShowSettings] = useState(false);
   const [showRules, setShowRules] = useState(true);
 
   return (
-    <div className="mb-6">
+    <div>
       <div className="flex justify-between items-center mb-4">
         <PlayerTurn />
         <div className="flex items-center gap-2">
@@ -33,17 +32,14 @@ const GameInfo: React.FC = () => {
       </div>
 
       {showRules && <RulesPopup onClose={() => setShowRules(false)} />}
-
       {showSettings && <Settings onClose={() => setShowSettings(false)} />}
 
       <div className="h-0.5 bg-gradient-to-r from-blue-100 via-purple-100 to-red-100 my-4 shadow-sm" />
 
-      <MoveTimers />
-
       {winner && (
         <>
           <div className="h-0.5 bg-gradient-to-r from-blue-100 via-purple-100 to-red-100 my-4 shadow-sm" />
-          <div className="text-center">
+      <div className="text-center">
             <div className={`
               p-3 mb-3 rounded-lg font-medium text-lg
               ${winner === 'X' ? 'bg-blue-100 text-blue-800' : 
@@ -60,6 +56,9 @@ const GameInfo: React.FC = () => {
               Play Again
             </button>
           </div>
+          <p className="mt-4 text-gray-600 text-sm text-center">
+            Oldest moves disappear after the timer runs out. Be quick to win!
+          </p>
         </>
       )}
     </div>

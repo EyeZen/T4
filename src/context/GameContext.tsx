@@ -16,9 +16,11 @@ interface GameContextType {
   winningCombination: number[] | null;
   moves: Move[];
   moveTimeLimit: number;
+  showSidePanel: boolean;
   makeMove: (position: number) => void;
   resetGame: () => void;
   setMoveTimeLimit: (seconds: number) => void;
+  setShowSidePanel: (show: boolean) => void;
 }
 
 const DEFAULT_MOVE_TIME_LIMIT = 10; // seconds
@@ -32,6 +34,8 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [winningCombination, setWinningCombination] = useState<number[] | null>(null);
   const [moves, setMoves] = useState<Move[]>([]);
   const [moveTimeLimit, setMoveTimeLimit] = useState<number>(DEFAULT_MOVE_TIME_LIMIT);
+  const [showSidePanel, setShowSidePanel] = useState<boolean>(false);
+  const [inactivityTimer, setInactivityTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   // Check for winner or draw
   const checkGameStatus = useCallback((newBoard: (Player | null)[]) => {
@@ -41,39 +45,52 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setWinningCombination(result.combination);
       return true;
     }
-    
+
     // Check for draw (all cells filled)
     if (newBoard.every(cell => cell !== null)) {
       setWinner('draw');
       return true;
     }
-    
+
     return false;
   }, []);
 
+  // Handle inactivity timeout
+  const handleInactivityTimeout = useCallback(() => {
+    if (!winner) {
+      const otherPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      setWinner(otherPlayer); // Declare the other player as the winner
+    }
+  }, [currentPlayer, winner]);
+
+  // Reset inactivity timer
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+    }
+    setInactivityTimer(
+      setTimeout(handleInactivityTimeout, 2 * moveTimeLimit * 1000) // 2x the move time limit
+    );
+  }, [inactivityTimer, handleInactivityTimeout, moveTimeLimit]);
+
   // Remove oldest move for a player
   const removeOldestMove = useCallback((player: Player) => {
-    // Filter moves for the current player
     const playerMoves = moves.filter(move => move.player === player);
-    
+
     if (playerMoves.length === 0) return;
-    
-    // Find the oldest move
-    const oldestMove = playerMoves.reduce((oldest, move) => 
+
+    const oldestMove = playerMoves.reduce((oldest, move) =>
       move.timestamp < oldest.timestamp ? move : oldest, playerMoves[0]);
-    
-    // Create a new board without the oldest move
+
     const newBoard = [...board];
     newBoard[oldestMove.position] = null;
-    
-    // Update the moves list
-    const newMoves = moves.filter(move => 
+
+    const newMoves = moves.filter(move =>
       !(move.position === oldestMove.position && move.player === oldestMove.player));
-    
+
     setBoard(newBoard);
     setMoves(newMoves);
-    
-    // Check if this changes the game status
+
     checkGameStatus(newBoard);
   }, [board, moves, checkGameStatus]);
 
@@ -81,23 +98,21 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (winner || moves.length === 0) return;
 
-    const timers: NodeJS.Timeout[] = [];
-    
-    // For each move, set a timer to remove it after the time limit
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
     moves.forEach(move => {
       const expirationTime = move.timestamp + moveTimeLimit * 1000;
       const timeRemaining = expirationTime - Date.now();
-      
+
       if (timeRemaining > 0) {
         const timer = setTimeout(() => {
           removeOldestMove(move.player);
         }, timeRemaining);
-        
+
         timers.push(timer);
       }
     });
-    
-    // Cleanup timers on unmount or when moves change
+
     return () => {
       timers.forEach(timer => clearTimeout(timer));
     };
@@ -106,27 +121,26 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Make a move
   const makeMove = (position: number) => {
     if (board[position] !== null || winner) return;
-    
+
     const newBoard = [...board];
     newBoard[position] = currentPlayer;
-    
+
     const newMove: Move = {
       position,
       player: currentPlayer,
       timestamp: Date.now()
     };
-    
+
     const newMoves = [...moves, newMove];
-    
+
     setBoard(newBoard);
     setMoves(newMoves);
-    
-    // Check if game is over
+
     const gameOver = checkGameStatus(newBoard);
-    
+
     if (!gameOver) {
-      // Switch players
       setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
+      resetInactivityTimer(); // Reset inactivity timer after a valid move
     }
   };
 
@@ -137,6 +151,9 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setWinner(null);
     setWinningCombination(null);
     setMoves([]);
+    if (inactivityTimer) {
+      clearTimeout(inactivityTimer);
+    }
   };
 
   const value = {
@@ -146,9 +163,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     winningCombination,
     moves,
     moveTimeLimit,
+    showSidePanel,
     makeMove,
     resetGame,
-    setMoveTimeLimit
+    setMoveTimeLimit,
+    setShowSidePanel
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

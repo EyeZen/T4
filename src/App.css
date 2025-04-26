@@ -1,3 +1,69 @@
+/* Center the gameboard and side panel */
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+  background: linear-gradient(to bottom right, #eef2ff, #e0e7ff);
+}
+
+/* Main game container */
+.game-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  width: 100%;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .game-container {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+}
+
+/* Gameboard styling */
+.gameboard {
+  flex: 1;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Side panel styling */
+.side-panel {
+  width: 100%;
+  background: #f3f4f6;
+  border-top: 1px solid #d1d5db;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 768px) {
+  .side-panel {
+    width: 16rem;
+    border-top: none;
+    border-left: 1px solid #d1d5db;
+  }
+}
+
+/* Responsive text alignment */
+.text-center {
+  text-align: center;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+/* Existing animations and styles remain unchanged */
 @keyframes pop-in {
   0% {
     transform: scale(0);

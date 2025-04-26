@@ -6,7 +6,7 @@ interface SettingsProps {
 }
 
 const Settings: React.FC<SettingsProps> = ({ onClose }) => {
-  const { moveTimeLimit, setMoveTimeLimit, resetGame } = useGame();
+  const { moveTimeLimit, setMoveTimeLimit, resetGame, showSidePanel, setShowSidePanel } = useGame();
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value, 10);
@@ -42,6 +42,18 @@ const Settings: React.FC<SettingsProps> = ({ onClose }) => {
           <span>{moveTimeLimit}s</span>
           <span>30s</span>
         </div>
+      </div>
+
+      <div className="mb-3">
+        <label className="flex items-center text-sm text-gray-600">
+          <input
+            type="checkbox"
+            checked={showSidePanel}
+            onChange={(e) => setShowSidePanel(e.target.checked)}
+            className="mr-2"
+          />
+          Show Side Panel
+        </label>
       </div>
       
       <div className="flex justify-end space-x-2">
