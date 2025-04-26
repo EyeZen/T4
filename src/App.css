@@ -1,0 +1,126 @@
+@keyframes pop-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes draw-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes draw-line-diagonal {
+  from {
+    transform: translate(-50%, -50%) rotate(45deg) scaleX(0);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(45deg) scaleX(1);
+  }
+}
+
+@keyframes draw-line-diagonal-reverse {
+  from {
+    transform: translate(-50%, -50%) rotate(-45deg) scaleX(0);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(-45deg) scaleX(1);
+  }
+}
+
+.pop-in {
+  animation: pop-in 0.5s forwards;
+}
+
+.fade-out {
+  animation: fade-out 0.5s forwards;
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+.cell-x {
+  color: #3b82f6; /* blue-500 */
+}
+
+.cell-o {
+  color: #f56565; /* red-500 */
+}
+
+.winner-cell {
+  background-color: rgba(134, 239, 172, 0.4); /* light green */
+}
+
+.winning-line {
+  position: absolute;
+  background: #34d399;
+  transform-origin: center;
+}
+
+.winning-line-horizontal {
+  height: 4px;
+  width: 100%;
+  animation: draw-line 0.5s ease-out forwards;
+}
+
+.winning-line-vertical {
+  height: 100%;
+  width: 4px;
+  transform-origin: top;
+  animation: draw-line 0.5s ease-out forwards;
+}
+
+.winning-line-diagonal {
+  height: 4px;
+  width: 141.4%;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  animation: draw-line-diagonal 0.5s ease-out forwards;
+}
+
+.winning-line-diagonal-reverse {
+  height: 4px;
+  width: 141.4%;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  animation: draw-line-diagonal-reverse 0.5s ease-out forwards;
+}
+
+.game-over {
+  animation: pop-in 0.5s forwards;
+}
